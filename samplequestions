@@ -1,0 +1,105 @@
+Write a scripts which copies the content of file1 to file2 without using cp command. It
+should check If file has a read permissions if not it should print an error message. If file2
+exits then it should ask the user whether he wants to overwrite it. Demonstrate your
+work making all assumptions.
+copy.sh
+file1=$1
+file2=$2
+
+if [[ -r $file1 ]]
+then
+        echo "File1 is readable."
+else
+        echo "ERROR: File1 is unreadable"
+        exit
+fi
+if [[ -a $file2 ]]
+then
+        read -p "File2 already exists. Are you sure you want to overwrite it?(Y/N)" i
+        case $i in
+                Y) $(cat $file1 > $file2)
+                echo "File successfully copied"
+                ;;
+                N) exit
+                ;;
+                *) echo "Invalid Input"
+        esac
+else
+        $(cat $file1 > $file2)
+        echo "File successfully copied"
+fi
+
+
+
+
+Create a text file containing 10 employee information like eid, ename, department and
+salary. The fields are separated by tab spaces. Assume the departments are SALES,
+ADMIN, HR, PRODUCTION.
+1. List department names alone in the file. Each department name should
+occur only
+once.
+2. List the highest salary earner in the HR department
+3. List only employee names that are duplicated.
+4. Find the total salary spent by the company
+Theses should be executed inside a script with the name of the text file supplied
+as command line parameter.
+
+ sql.sh
+file=$1
+
+departments=$(awk 'NR != 1 {print $3}' $file | sort | uniq)
+echo "The distinct departments are:"
+for d in $departments
+do
+        echo $d
+done
+
+salaries=$(awk '$3 == "HR" {print $4}' $file)
+max=0
+for s in $salaries
+do
+        [[ $s -gt $max ]] && max=$s || continue
+done
+echo -e "\n\nThe maximum salary in the HR department is $max"
+
+names=$(awk 'NR != 1 {print $2}' $file | sort | uniq -d)
+echo -e "\n\nThe duplicated names are:"
+for n in $names
+do
+        echo $n
+done
+
+salaries=$(awk 'NR != 1 {print $4}' $file)
+sum=0
+for s in $salaries
+do
+        sum=`expr $sum + $s`
+done
+echo -e "\n\nThe total salary is $sum"
+
+
+
+
+Write a shell script to validate password strength. Here are a few assumptions for the password
+string.
+ Length - minimum of 8 characters.
+ Contain both alphabet and number.
+ Include both the small and capital case letters.
+If the password doesn’t comply to any of the above conditions, then the script should report it as
+a &lt;Weak Password&gt;, comply to all above condition then say “Strong Password”.
+
+ password.sh
+read -p "Enter your password: " password
+if [[ ${#password} -lt 8 ]]
+then
+        echo "Weak Password: Too short"
+        exit
+elif ! [[ $password =~ [[:alpha:]] && $password =~ [[:digit:]] ]]
+then
+        echo "Weak Password: No alphabets or no numbers"
+elif ! [[ $password =~ [[:upper:]] && $password =~ [[:lower:]] ]]
+then
+        echo "Weak Password: No uppercase or no lowercase alphabets"
+else
+        echo "Strong Password"
+fi
