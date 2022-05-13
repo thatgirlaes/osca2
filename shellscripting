@@ -1,0 +1,272 @@
+Write a script which displays “Good morning”, “Good afternoon” or “Good
+evening”,
+on the monitor, depending on the time of running the script.
+2. Write a script which:
+1. prompts to read your name and age:
+Enter your name: James
+Enter your age: 25
+Use the built in read command to read input from the user. Use echo -n to print
+the prompt without a newline at the end.
+3. Write the read name to the first line of a file named my info.
+Use file redirection (>) to do this.
+Change your age to age × 3 − 3 and write the value to the second line of my info.
+You can use let to do the arithemtic. Use file redirection with appending (>>)
+to do this.
+Content of my info:
+my name is James
+my modified age is 72
+4. Write a shell script which reads a number in units of seconds and converts it to
+the units
+hours:minutes:seconds and prints the result to standard output.
+Your script must prompt for re-input if a negative value is input
+Enter number of seconds: 12345
+Result:
+12345 seconds is 3:25:45
+5. Write a shell script to do
+(i). counting number of user logged in
+(ii). Printing column list of your current directory
+(iii). Running your job after logging out.
+6. Write a shell script that receives any number of file names as its arguments,
+counts and reports the occurrence of each word that is present in the first
+argument file on other argument files
+7. Write a shell script that receives any number of file names as its arguments,
+checks if every argument supplied is a file or a directory and reports accordingly.
+Whenever the argument is a file, the number of lines on it is also reported.
+8. Write a shell script that deletes all lines containing a specified word in one or
+more files supplied as arguments to it.
+9. Write a shell script which displays the following menu and executes the option
+selected by user:
+a. ls
+
+b. pwd
+c. ls –l
+d. ps -fe
+10. Write a shell script to display the digits which are in odd position in a given 5
+digit number
+11. Write a shell program to search for a given number from the list of numbers
+provided using binary search method
+12. Write a shell program to find the position of substring in given string
+13. Write a shell program to display the alternate digits in a given 7 digit number
+starting from the first digit
+14. Write a shell program to convert all the contents into the uppercase in a particular
+file
+15. Write a shell program to count number of words, characters, white spaces and
+special symbols in a given text
+16. Write a shell script to sort the given numbers in descending order using Bubble
+sort
+17. Write a shell script to find occurrence of particular digit in inputted number
+18. Write a shell script that reads each line of a target file, then writes the line back to
+stdout, but with an extra blank line following. This has the effect of a double
+spacing the file. Include all necessary code whether the script gets the necessary
+command line argument (a filename), and whether the specified file exists. When
+the script runs correctly, modify it to triple-space the target file. Finally, write a
+script to remove all blank lines from the target file, single-spacing it.
+19. A “lucky number” is one whose individual digits add upto 7, in successive
+additions. For ex. 62431 is a lucky no. (6+4+2+3+1=16, 1+6=7). Write a shell
+script to find all “lucky numbers” between 1000 and 10000.
+20. Write a shell script to perform the following.
+a) Determine your login shell and change it to BASH and determine your current
+path and set it for your home directory. (and if it is already BASH)
+b) Use the who command and redirect the result to a file called myfile1 and display
+the contents of myfile1.
+c) Verify that you are in your home directory, make the directory named mydir
+under your home directory, enter into mydir and verify that you are into the
+myfile directory.
+d) Make a file named testfile under mydir, verify that the file testfile exists and list
+the contents of the file testfile to the screen.
+e) Make a copy of the file testfile with the name secondfile, verify that the files
+testfile and secondfile both exist, list the contents of both testfile and secondfile to
+the monitor screen.
+f) Delete the file testfile, verify that testfile has been deleted, clear the window.
+g) Enter into mydir rename secondfile to thefile, copy thefile to your home directory,
+remove thefile from the current directory, verify that thefile has been removed.
+h) enter into mydir, copy thefile from your home directory to the current directory,
+verify that thefile has been copied from your home directory to the current
+
+directory.
+i) Change directories to your home directory, verify that you are in your home
+directory, verify that a copy of thefile is in your home directory.
+j) Remove thefile from your home directory, remove thefile from the directory
+mydir, remove the directory mydir from your home directory with the following
+command.
+k) Verify that thefile and mydir are gone from your home directory.
+
+
+
+
+h=$(date +"%H")
+if [ $h -ge 4 -a $h -le 11 ]
+then
+        echo Good Morning
+elif [ $h -ge 12 -a $h -le 15 ]
+then
+        echo Good Afternoon
+elif [ $h -ge 16 -a $h -le 19 ]
+then
+        echo Good Evening
+else
+        echo Good Night
+fi
+
+
+2)
+read -p 'Enter your name: ' name
+read -p 'Enter your age: ' age
+echo -n $name
+echo $age
+
+age=`expr $age \* 3 - 3`
+echo "My name is $name" > myinfo
+echo "My modified age is $age" >> myinfo
+
+
+4)
+read -p "Enter the number of seconds: " seconds
+while [ $seconds -lt 0 ]
+do
+        read -p "Enter a positive value: " seconds
+done
+
+h=`expr $seconds / 3600`
+m=`expr $seconds % 3600 / 60`
+s=`expr $seconds % 60`
+
+echo -e "$h:$m:$s\n"
+
+
+5)
+users=$(who|wc -l)
+echo "Number of users logged in: $users"
+
+files=$(ls)
+echo -e "\nFiles in this directory:"
+for file in $files
+do
+        echo $file
+done
+
+
+6)
+files=$@
+words=$(<$1)
+
+for file in $files
+do
+        for word in $words
+        do
+                count=$(grep -o $word $file | wc -l)
+                echo "$word has $count occurences of $word"
+        done
+        echo -e "\n"
+done
+
+
+7)
+for file in $*
+do
+        if [ -f $file ]
+        then
+                echo "$file is a file"
+                lines=$(cat $file | wc -l)
+                echo "$file has $lines lines"
+        elif [ -d $file ]
+        then
+                echo "$file is a directory"
+        else
+                echo "$file is a mystery"
+        fi
+done
+
+
+8)
+read -p "Enter the word: " word
+echo "All lines with the word $word will be deleted"
+
+for file in $*
+do
+        sed "/$word/d" $file | tee temp
+        mv temp $file
+done
+
+
+9)
+i=0
+while [ $i != 5 ]
+do
+        echo -e "1. ls\n2. pwd\n3. ls -l\n4. ps -fe\n5. Exit\n"
+        read i
+        case $i in
+                1) echo -e "$(ls)\n\n"
+                ;;
+                2) echo -e "$(pwd)\n\n"
+                ;;
+                3) echo -e "$(ls -l)\n\n"
+                ;;
+                4) echo -e "$(ps -fe)\n\n"
+                ;;
+                5) exit
+                ;;
+                *)
+                echo -e "Invalid Input\n\n"
+                ;;
+        esac
+done
+
+
+10)
+read -p "Enter a 5 digit number: " num
+for i in {1..5}
+do
+        digit=$(echo $num | cut -c $i)
+        if [ `expr $i % 2` == 1 ]
+        then
+                echo $digit
+        fi
+done
+
+
+12)
+word=$1
+read -p "Enter the target substring: " target
+
+strindex() {
+        x="${1%%$2*}"
+        echo $x
+        [[ "$x" = "$1" ]] && echo -1 || echo "${#x}"
+}
+
+strindex "$word" "$target"
+
+
+13)
+read -p "Enter a 7 digit number: " num
+
+for i in {1..7}
+do
+        if [ `expr $i % 2` == 1 ]
+        then
+                echo $(echo $num | cut -c $i)
+        fi
+done
+
+
+14)
+content=$(<$1)
+echo $content
+content=${content^^}
+echo $content
+echo $content > $1
+
+
+15)
+content=$(<$1)
+
+words=$(echo $content|wc -w)
+chars=$(echo $content|wc -c)
+spaces=$(echo $content | grep -o ' ' | wc -l)
+symbols=$(expr length "${content//[^\~!@#$&*()]/}")
+
+echo "Number of words = $words"
+echo "Number of characters = $chars"
+echo "Number of white spaces = $spaces"
+echo "Number of special symbols = $symbols"
