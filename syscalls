@@ -1,3 +1,304 @@
+Analyse the following program output.
+a)
+main()
+{
+fork();fork();printf("yes");
+}
+prints yes:
+b) main()
+{
+if(fork()>0)
+sleep(100);
+}
+c) How many times printf() will be executed in the below mentioned program?
+main() {
+int i;
+for (i = 0; i < 4; i++)
+fork();
+printf(“my pid = %d\n”, getpid());
+}
+d) What is the output of the below code?
+void exit_handler1();
+void exit_handler2();
+int main() {
+int pid;
+atexit(exit_handler1);
+atexit(exit_handler2);
+pid = fork();
+if(pid == 0) {
+_exit(0);
+} else {
+sleep(2);
+exit(0);
+}
+return 0;
+}
+e) What is output of the following program?
+int main() {
+fork();
+fork();
+fork();
+if (wait(0) == -1)
+printf(“leaf child\n”);
+}
+f) Predict the Output of the following program.
+
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+int main() {
+// make two process which run same
+// program after this instruction
+fork();
+printf("Hello world!\n");
+return 0;
+}
+g) Calculate number of times hello is printed.
+
+#include <stdio.h>
+#include <sys/types.h>
+int main()
+{
+fork();
+fork();
+fork();
+printf("hello\n");
+return 0;
+}
+
+h) Predict the Output of the following program
+#include<stdio.h>
+#include <sys/types.h>
+#include<unistd.h>
+void forkexample()
+{
+// child process because return value zero
+if (fork()==0)
+printf("Hello from Child!\n");
+// parent process because return value non-zero.
+else
+printf("Hello from Parent!\n");
+}
+int main()
+{
+forkexample();
+return 0;
+}
+i) Predict the Output of the following program.
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+void forkexample()
+{
+int x = 1;
+
+if (fork() == 0)
+printf("Child has x = %d\n", ++x);
+else
+printf("Parent has x = %d\n", --x);
+}
+int main()
+{
+forkexample();
+return 0;
+}
+j) A process executes the following code.
+
+for (i = 0; i < n; i++)
+fork();
+
+The total number of child processes created is:
+(A) n (B) 2^n – 1 (C) 2^n (D) 2^(n+1) – 1;
+k) Consider the following code fragment:
+
+if (fork() == 0)
+{
+a = a + 5;
+printf("%d, %d\n", a, &a);
+}
+else
+{
+a = a –5;
+printf("%d, %d\n", a, &a);
+}
+Let u, v be the values printed by the parent process, and x, y be the values printed by
+the child process. Which one of the following is TRUE?
+(A) u = x + 10 and v = y
+(B) u = x + 10 and v != y
+(C) u + 10 = x and v = y
+(D) u + 10 = x and v != y
+l) Predict output of below program.
+#include <stdio.h>
+#include <unistd.h>
+int main()
+{
+fork();
+fork() && fork() || fork();
+fork();
+printf("forked\n");
+return 0;
+}
+m) A process executes the code
+fork();
+fork();
+
+fork();
+The total number of processes in the system are?
+a) 3 b) 4 c) 7 d) 8
+n) Predict the output of the following program code.
+main()
+{
+fork();
+printf("Hello:\n");
+fork()
+printf(“Hello:\n”);
+}
+a) Hello:
+Hello:
+b) Hello:
+Hello:
+Hello:
+Hello:
+c) Hello:
+Hello:
+Hello:
+Hello:
+Hello:
+Hello:
+d) Nothing will be printed
+o) What will be the output of the following code?
+#include<sys/types.h>
+#include<stdio.h>
+int main()
+{
+pid_t p;
+p=fork();
+if(p>0) {
+printf("Parent:");
+
+wait();
+}
+else
+printf("Child:");
+
+}
+a. Child:Parent:
+b. Parent:Child:
+c. Parent:Parent:
+d. Child:Child:
+p) What will be the output of the following code?
+#include<sys/types.h>
+#include<stdio.h>
+int main()
+{
+pid_t p;
+
+p=fork();
+if(p>0) {
+printf("Parent:");
+}
+else
+printf("child:");
+
+}
+a. Child:Parent:
+b. Parent:Child:
+c. Can be either (a) or (b)
+d. Neither (a) nor (b)
+q) What will be the output of the following code?
+#include<sys/types.h>
+#include<stdio.h>
+int main()
+{
+pid_t p;
+p=fork();
+if(p>0) {
+printf("Parent:");
+}
+else
+printf("child:");
+
+}
+a. Child:Parent:
+b. Parent:Child:
+c. Can be either (a) or (b)
+d. Neither (a) nor (b)
+r) #include<sys/types.h>
+#include<stdio.h>
+int main()
+{
+pid_t p;
+p=fork();
+if(p=0)
+fork();
+
+}
+The code above creates
+a. 4 process
+b. 2 process
+c. Two child processes of a single process
+d. Hierarchy of three processes
+
+10. 2Try these problems for the basic understanding of system calls
+1. 1.Write a program that calls fork(). Before calling fork(), have the main process access a
+variable (e.g., x) and set its value to something (e.g., 100). What value is the variable in
+
+the child process? What happens to the variable when both the child and parent change
+the value of x?
+2. Write a program that opens a file (with the open() system call) and then calls fork() to
+create a new process. Can both the child and parent access the file descriptor returned by
+open()? What happens when they are writing to the file concurrently, i.e., at the same
+time?
+3. Write another program using fork(). The child process should print “hello”; the parent
+process should print “goodbye”. You should try to ensure that the child process always
+prints first; can you do this without calling wait() in the parent?
+4. Write a program that calls fork() and then calls some form of exec() to run the program
+/bin/ls. See if you can try all of the variants of exec(), including (on Linux) execl(),
+execle(), execlp(), execv(), execvp(), and execvpe(). Why do you think there are so many
+variants of the same basic call?
+5. Now write a program that uses wait() to wait for the child process to finish in the parent.
+What does wait() return? What happens if you use wait() in the child?
+6. Write a slight modification of the previous program, this time using waitpid() instead of
+wait(). When would waitpid() be useful?
+7. Write a program that creates a child process, and then in the child closes standard output
+(STDOUT FILENO). What happens if the child calls printf() to print some output after
+closing the descriptor?
+8. Write a program that creates two children, and connects the standard output of one to the
+standard input of the other, using the pipe() system call.
+10.3 C Programs Using UNIX System calls
+1. Write a C program that makes a copy of a file using standard I/O and system calls.(using
+command line arguments)
+2. Write a C program to implement ‘cat’ command using system calls
+3. Write a C program to implement ‘ls’ command using system calls
+4. Write a program that takes one or more file/directory names as command line input and reports
+the following information on the file.
+A. File type.
+B. Number of links.
+C. Time of last access.
+D. Read, Write and Execute permissions.
+5. Write a C program to emulate the Unix ls –l command.
+6. Write a C program that demonstrates redirection of standard output to a file.Ex: ls > f1.
+7. Write a C program to create a child process and allow the parent to display “parent” and the
+child to display “child” on the screen.
+8. Write a C program to create a Zombie process.
+9. Write a C program that illustrates how an orphan is created.
+10. Write a C program that illustrates how to execute two commands concurrently with a command
+pipe. Ex:- ls –l | sort
+11. Write a C program that illustrates suspending and resuming processes using signals.
+12. Write a C program to implement IPC using unnamed pipes ( anonymous pipe)
+13. Write a C program to implement half duplex communication between two unrelated processes
+using named pipe(FIFO)
+14. Write a C program to implement full duplex communication between two unrelated processes
+using named pipe(FIFO)
+
+15. Write the C programs to demonstrate message queue IPC
+16. Write a C program that illustrates two processes communicating using shared memory
+17. Write a C Program that demonstrate semaphores
+18. Write client and server programs(using c) for interaction between server and client processes
+using TCP/IP sockets.
+19. Write client and server programs(using c) for interaction between server and client processes
+using UDP sockets.
+20. Write a C program to demonstrate multi threading
 10.1
 a)
 #include <sys/types.h>
