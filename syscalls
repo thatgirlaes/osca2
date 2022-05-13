@@ -1,0 +1,955 @@
+10.1
+a)
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+using namespace std;
+int main()
+{
+fork();
+fork();
+printf("Yes");
+return 0;
+}
+// Prints “Yes” four times
+b)
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+using namespace std;
+int main()
+{
+if(fork() > 0)
+sleep(10);
+return 0;
+}
+// Waits for 100 seconds
+c)
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+using namespace std;
+int main()
+{
+int i;
+for(i = 0; i < 4; i++)
+fork();
+printf("My PID = %d\n", getpid());
+return 0;
+}
+// printf() will be executed 16 times
+Output:
+My PID = 19198
+My PID = 19202
+My PID = 19201
+My PID = 19200
+My PID = 19203
+My PID = 19199
+My PID = 19205
+My PID = 19204
+My PID = 19208
+My PID = 19207
+My PID = 19206
+My PID = 19209
+My PID = 19210
+My PID = 19212
+My PID = 19211
+My PID = 19213
+d)
+Only the parent executes the exit_handler 1 and 2.
+e)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/wait.h>
+int main()
+{
+fork();
+fork();
+fork();
+if(wait(0) == -1)
+printf("Leaf Child\n");
+return 0;
+}
+// Prints “Leaf Child” four times
+f)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+fork();
+printf("Hello World\n");
+return 0;
+}
+// Prints “Hello World” two times
+g)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+fork();
+fork();
+fork();
+printf("Hello\n");
+return 0;
+}
+// Prints “Hello” eight times
+h)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+void forkexample()
+{
+if(fork() == 0)
+printf("Hello from Child\n");
+else
+printf("Hello from Parent\n");
+}
+int main()
+{
+forkexample();
+return 0;
+}
+// Output
+Hello from Parent
+Hello from Child
+i)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+void forkexample()
+{
+int x = 1;
+if(fork() == 0)
+printf("Child has x = %d\n", ++x);
+else
+printf("Parent has x = %d\n", --x);
+}
+int main()
+{
+forkexample();
+return 0;
+}
+//Output
+Parent has x = 0
+Child has x = 2
+j)
+C) 2^n
+k)
+C) u + 10 = x and v = y
+l)
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+fork();
+fork() && fork() || fork();
+fork();
+printf("Forked");
+return 0;
+}
+// Output
+ForkedForkedForkedForkedForkedForkedForkedForkedForkedForkedForkedForkedFor
+kedForkedForkedForkedForkedForkedForkedForked
+m)
+d) 8
+n)
+c) Hello:
+Hello:
+Hello:
+Hello:
+Hello:
+Hello:
+o)
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+int main()
+{
+pid_t p;
+p = fork();
+if(p > 0)
+{
+printf("Parent:");
+wait();
+}
+else
+{
+printf("Child:");
+}
+return 0;
+}
+// Error
+too few arguments to function ‘__pid_t wait(void*)’
+wait();
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+int main()
+{
+pid_t p;
+p = fork();
+if(p > 0)
+{
+printf("Parent:");
+wait();
+}
+else
+{
+printf("Child:");
+}
+return 0;
+}
+// Output
+Child:Parent:
+p)
+b) Parent:Child:
+q)
+b) Parent:Child:
+r)
+b) 2 processes
+10.2
+1.
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+int main()
+{
+int x = 100;
+printf("PID: %d\n", (int)getpid());
+printf("Value of x before fork is: %d\n", x);
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+}
+else if(rc == 0)
+{
+printf("Child PID: %d\n", (int)getpid());
+printf("Value of x from child is %d\n", x);
+printf("Changing the value of x to 200\n");
+x = 200;
+printf("Value of x from Child: %d\n", x);
+}
+else
+{
+printf("Parent of %d PID: %d\n", rc, (int)getpid());
+printf("Value of x from parent after fork is %d\n", x);
+printf("Changing the value of x in parent to 300\n");
+x = 300;
+printf("Value of x from Parent: %d\n", x);
+}
+return 0;
+}
+// Output
+PID: 3713
+Value of x before fork is: 100
+Parent of 3714 PID: 3713
+Value of x from parent after fork is 100
+Changing the value of x in parent to 300
+Value of x from Parent: 300
+Child PID: 3714
+Value of x from child is 100
+Changing the value of x to 200
+Value of x from Child: 200
+2.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/wait.h>
+int main()
+{
+printf("PID: %d", (int)getpid());
+int fd = open("Sample.txt", O_RDONLY);
+if(fd == -1)
+{
+printf("Unable to open file\nExiting...\n");
+return 0;
+}
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+printf("Child PID: %d", (int)getpid());
+char x;
+read(fd, &x, 1);
+printf("Reading a character from the file through the Child: %c\n", x);
+}
+else
+{
+wait(NULL);
+printf("Parent of %d (PID: %d)\n", rc, (int)getpid());
+char x;
+read(fd, &x, 1);
+printf("Reading a character from the file through the Parent: %c\n", x);
+}
+return 0;
+}
+// Output
+PID: 5132Child PID: 5133Reading a character from the file through the Child: A
+PID: 5132Parent of 5133 (PID: 5132)
+Reading a character from the file through the Parent: B
+// Both share the same descriptor.
+// Both can write to the same file, but their outputs in file will appear in some random
+order.
+3.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+int main()
+{
+int x = 100;
+printf("PID: %d\n", (int)getpid());
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+printf("Child PID: %d\n", (int)getpid());
+}
+else
+{
+for(int i = 0; i < 100000; i++)
+{
+;
+}
+printf("Goodbye - Parent of %d (PID: %d)\n", rc, (int)getpid());
+}
+return 0;
+}
+// Output
+PID: 5951
+Goodbye - Parent of 5952 (PID: 5951)
+Child PID: 5952
+4.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+int main()
+{
+printf("PID: %d\n", (int)getpid());
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+printf("Child PID: %d\n", (int)getpid());
+char *myargs[3];
+myargs[0] = strdup("ls");
+myargs[1] = strdup("-a");
+myargs[2] = NULL;
+char *const envp[2] = {"", NULL};
+//execvp(myargs[0], myargs);
+execle("/usr/bin/ls", "-a", NULL, envp);
+printf("This should not be printed\n");
+}
+else
+{
+int wc = wait(NULL);
+printf("Parent of %d (WC: %d) (PID: %d)\n", rc, wc, (int)getpid());
+}
+return 0;
+}
+// Output
+PID: 8583
+Child PID: 8584
+. 10_1a.cpp 10_1e.cpp 10_1i.cpp 10_1m.cpp 10_1q.cpp 10_23.cpp
+Sample.txt
+.. 10_1b.cpp 10_1f.cpp 10_1j.cpp 10_1n.cpp 10_1r.cpp 10_24.cpp
+10_14.cpp.save 10_1c.cpp 10_1g.cpp 10_1k.cpp 10_1o.cpp 10_21.cpp a.out
+.10_14.cpp.swp 10_1d.cpp 10_1h.cpp 10_1l.cpp 10_1p.cpp 10_22.cpp Rough.cpp
+Parent of 8584 (WC: 8584) (PID: 8583)
+5.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+int main()
+{
+printf("PID: %d\n", (int)getpid());
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+printf("Child PID: %d\n", (int)getpid());
+sleep(1);
+}
+else
+{
+int wc = wait(NULL);
+printf("Parent of %d (wc: %d) (PID: %d)\n", rc, wc, (int)getpid());
+}
+return 0;
+}
+// Output
+PID: 8932
+Child PID: 8933
+Parent of 8933 (wc: 8933) (PID: 8932)
+6.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+int main()
+{
+printf("PID: %d\n", (int)getpid());
+pid_t rc = fork();
+int status;
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+printf("Child PID: %d\n", (int)getpid());
+sleep(1);
+}
+else
+{
+pid_t wc = waitpid(rc, &status, WUNTRACED);
+printf("Parent of %d (WC: %d) (PID: %d)\n", rc, wc, (int)getpid());
+}
+return 0;
+}
+// Output
+PID: 9363
+Child PID: 9364
+Parent of 9364 (WC: 9364) (PID: 9363)
+7.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <assert.h>
+#include <sys/wait.h>
+int main()
+{
+int rc = fork();
+if(rc < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc == 0)
+{
+close(STDOUT_FILENO);
+open("Sample.txt", O_CREAT|O_WRONLY|O_TRUNC, S_IRWXU);
+printf("Printing from Child...\n");
+}
+else
+{
+int wc = wait(NULL);
+assert(wc >= 0);
+}
+return 0;
+}
+// Output
+$ cat Sample.txt
+Printing from Child...
+8.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <assert.h>
+#include <sys/wait.h>
+int main()
+{
+int fd1[2];
+if(pipe(fd1) == -1)
+{
+fprintf(stderr, "Pipe Failed\n");
+return 1;
+}
+int rc1 = fork();
+if(rc1 < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc1 == 0)
+{
+dup2(fd1[1], 1);
+printf("This is from the FIRST Child\n");
+}
+else
+{
+int rc2 = fork();
+if(rc2 < 0)
+{
+fprintf(stderr, "Fork Failed\n");
+exit(1);
+}
+else if(rc2 == 0)
+{
+dup2(fd1[0], STDIN_FILENO);
+sleep(1);
+char message[100];
+gets(message);
+printf("The message from the FIRST Child is %s\n", message);
+}
+else
+{
+wait(NULL);
+}
+}
+return 0;
+}
+// Output
+The message from the FIRST Child is This is from the FIRST Child
+10.3
+1.
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+void typeFile(char *filename)
+{
+int fd, nread;
+char buf[1024];
+fd = open(filename, O_RDONLY);
+if(fd == -1)
+{
+perror(filename);
+return;
+}
+while((nread = read(fd, buf, sizeof(buf))) > 0)
+{
+write(1, buf, nread);
+}
+close(fd);
+}
+int main(int argc, char **argv)
+{
+int argno;
+for(argno = 1; argno < argc; argno++)
+{
+typeFile(argv[argno]);
+}
+exit(0);
+}
+// Output
+// ./a.out Text Text2
+A1B2C3
+!#@$%^
+987654
+321000
+2.
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+int main(int argc, char *argv[3])
+{
+int fd, i;
+char buf[2];
+fd = open(argv[1],O_RDONLY, 0777);
+if(fd == -argc)
+{
+printf("Error in Opening File");
+}
+else
+{
+while((i = read(fd, buf, 1)) > 0)
+{
+printf("%c", buf[0]);
+}
+close(fd);
+}
+}
+// Output
+// ./a.out Text
+A1B2C3
+!#@$%^
+3.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/dir.h>
+#include <sys/param.h>
+#define FALSE 0
+#define TRUE 1
+extern int alphasort();
+char pathname[MAXPATHLEN];
+int main()
+{
+int count, i;
+struct dirent **files;
+int file_select();
+if(getwd(pathname) == NULL)
+{
+printf("Error getting path\n");
+exit(0);
+}
+printf("Current Working Directory: %s\n", pathname);
+count = scandir(pathname, &files, file_select, alphasort);
+if(count <= 0)
+{
+printf("The directory is empty\n");
+exit(0);
+}
+printf("Number of files: %d\n", count);
+for(i = 1; i < count; i++)
+{
+printf("%s \n", files[i - 1]->d_name);
+}
+}
+int file_select(struct direct *entry)
+{
+if((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name> {
+return FALSE;
+}
+else
+{
+return TRUE;
+}
+}
+// Output
+// ./a.out
+Current Working Directory: /root/LinuxPractice/CA2/WS11
+Number of files: 6
+10_31.c
+Text
+Text2
+a.out
+cat.c
+[mv].
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+int main(int argc, char *argv[])
+{
+int i, fd1, fd2;
+char *file1, *file2, buf[2];
+file1 = argv[1];
+file2 = argv[2];
+printf("File 1 = %s\nFile 2 = %s\n", file1, file2);
+fd1 = open(file1, O_RDONLY, 0777);
+fd2 = creat(file2, 0777);
+while(i = read(fd1, buf, 1) > 0)
+{
+write(fd2, buf, 1);
+}
+remove(file1);
+close(fd1);
+close(fd2);
+}
+// Output
+// ./a.out Text Text2
+File 1 = Text
+File 2 = Text2
+4.
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+int main(int argc, char *argv[])
+{
+int i;
+mode_t file_perm;
+struct stat file_details;
+if(argc < 2)
+{
+printf("Error\n");
+exit(2);
+}
+for(i = 1; i < argc; i++)
+{
+printf("\n%s\n%s\n%s\n", "-----", argv[i], "-----");
+if(access(argv[i], F_OK) == -1)
+{
+printf("ERROR: File does not exist!\n\n");
+continue;
+}
+if(lstat(argv[i], &file_details) < 0)
+{
+printf("ERROR: Error doing 'stat' on file\n\n");
+continue;
+}
+if(S_ISREG(file_details.st_mode))
+printf("File Type: Regular\n");
+else if(S_ISDIR(file_details.st_mode))
+printf("File Type: Directory\n");
+else if(S_ISLNK(file_details.st_mode))
+printf("File Type: Symbolic Link\n");
+else
+printf("File Type: Other\n");
+printf("Number of links: %d\n", (int)file_details.st_nlink);
+printf("Time of last access: %s\n", ctime(&file_details.st_atime));
+printf("File Permissions:\n");
+file_perm = file_details.st_mode & ~S_IFMT;
+printf("\tUser:");
+if(file_perm & S_IRUSR) printf("Readable, ");
+else printf("Not readable, ");
+if ( file_perm & S_IWUSR ) printf("Writable, ");
+else printf("Not writable, ");
+if ( file_perm & S_IXUSR ) printf("Executable\n");
+else printf("Not executable\n");
+printf("\tGroup : ");
+if ( file_perm & S_IRGRP ) printf("Readable, ");
+else printf("Not readable, ");
+if ( file_perm & S_IWGRP ) printf("Writable, ");
+else printf("Not writable, ");
+if ( file_perm & S_IXGRP ) printf("Executable\n");
+else printf("Not executable\n");
+printf("\tOthers : ");
+if ( file_perm & S_IROTH ) printf("Readable, ");
+else printf("Not readable, ");
+if ( file_perm & S_IWOTH ) printf("Writable, ");
+else printf("Not writable, ");
+if ( file_perm & S_IXOTH ) printf("Executable\n");
+else printf("Not executable\n");
+}
+printf("Command executed successfully\n");
+return 1;
+}
+// Output
+// ./a.out Text
+-----
+Text
+-----
+File Type: Regular
+Number of links: 1
+Time of last access: Wed May 11 14:10:22 2022
+File Permissions:
+User:Readable, Writable, Executable
+Group : Readable, Not writable, Executable
+Others : Readable, Not writable, Executable
+Command executed successfully
+5.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+int main()
+{
+int pid;
+pid = fork();
+if(pid < 0)
+{
+printf("\nFork Failed\n");
+exit(-1);
+}
+else if(pid == 0)
+{
+execlp("/bin/ls", "ls", "-l", NULL);
+}
+else
+{
+wait(NULL);
+exit(0);
+}
+}
+// Output
+// ./a.out
+total 44
+-rw-r--r-- 1 root root 448 May 11 13:37 10_31.c
+-rw-r--r-- 1 root root 1944 May 11 15:51 10_34.c
+-rwxr-xr-x 1 root root 16320 May 11 15:58 a.out
+-rw-r--r-- 1 root root 356 May 11 13:50 cat.c
+-rw-r--r-- 1 root root 855 May 11 14:01 ls.c
+-rw-r--r-- 1 root root 306 May 11 15:58 ls_l.c
+-rw-r--r-- 1 root root 445 May 11 14:08 mv.c
+-rwxr-xr-x 1 root root 14 May 11 14:10 Text
+6.
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+int main(int argc, char *argv[])
+{
+char d[50];
+if(argc == 2)
+{
+bzero(d, sizeof(d));
+strcat(d, "ls ");
+strcat(d, "> ");
+strcat(d, argv[1]);
+system(d);
+}
+else
+{
+printf("\nInvalid number of inputs\n");
+}
+}
+// Output
+// cat Text
+10_31.c
+10_34.c
+10_36.c
+a.out
+cat.c
+ls.c
+ls_l.c
+mv.c
+Text
+Text2
+7.
+#include <stdio.h>
+#include <unistd.h>
+int main()
+{
+int rc = fork();
+if(rc < 0)
+printf("Fork Failed\n");
+else if(rc == 0)
+printf("Child(%d)\n", (int)getpid());
+else
+printf("Parent(%d)\n", (int)getpid());
+return 0;
+}
+// Output
+Parent(59)
+Child(60)
+8.
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+pid_t child_pid;
+child_pid = fork();
+if(child_pid > 0)
+{
+sleep(15);
+}
+else
+{
+exit(0);
+}
+return 0;
+}
+// Output
+Try running some commands, they will all be executed in the background(parent is
+done), but the results will only appear at the end of the sleep(only when child completes
+we completely come back to the shell)
+9.
+#include <stdio.h>
+#include <unistd.h>
+int main()
+{
+int pid;
+printf("PID of Original Process: %d\n", getpid());
+printf("PPID of Original Process: %d\n\n", getppid());
+pid = fork();
+if(pid != 0)
+{
+printf("Parent with PID:%d and PPID:%d\n", getpid(), getppid());
+printf("Child's PID: %d\n\n", pid);
+}
+else
+{
+sleep(4);
+printf("Child with PID:%d and PPID:%d\n\n", getpid(), getppid());
+}
+printf("PID %d terminates\n\n", getpid());
+}
+// Output
+PID of Original Process: 103
+PPID of Original Process: 9
+Parent with PID:103 and PPID:9
+Child's PID: 104
+PID 103 terminates
+┌──(root㉿Agi-TUF)-[~/LinuxPractice/CA2/WS11]
+└─# Child with PID:104 and PPID:8
+PID 104 terminates
+10.
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdlib.h>
+int main()
+{
+int pfds[2];
+char buf[30];
+if(pipe(pfds) == -1)
+{
+perror("Pipe Failed\n");
+exit(1);
+}
+if(!fork())
+{
+close(1);
+dup(pfds[1]);
+system("ls -l");
+}
+else
+{
+printf("Parent reading from pipe\n");
+while(read(pfds[0], buf, 30))
+printf("%s \n", buf);
+}
+}
+// Output
+Parent reading from pipe
+total 72
+-rw-r--r-- 1 root roo
+t 368 May 12 16:19 10_310.c
+-rw-r--r-- 1 root root 448 M
+ay 11 13:37 10_31.c
+-rw-r--r--
+1 root root 1944 May 11 15:5
+1 10_34.c
+-rw-r--r-- 1 root ro
+ot 282 May 12 13:18 10_36.c
+-rw-r--r-- 1 root root 229 M
+ay 12 13:22 10_37.c
+-rwxr-xr-x
+1 root root 16576 May 12 16:2
+0 a.out
+-rw-r--r-- 1 root root
+356 May 11 13:50 cat.c
+-rwr--r-- 1 root root 855 May 1
+1 14:01 ls.c
+-rw-r--r-- 1 root
+root 306 May 11 15:58 ls_l.
+c
+-rw-r--r-- 1 root root 445
+May 11 14:08 mv.c
+-rw-r--r--
+1 root root 449 May 12 13:33
+orphan.c
+-rwxr-xr-x 1 root ro
+ot 64 May 12 13:19 Text
+-rw
+-r--r-- 1 root root 40 May
+12 13:18 Text2
+-rw-r--r-- 1 ro
+ot root 190 May 12 13:28 zom
+bie.c
+t 190 May 12 13:28 zom
